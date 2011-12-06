@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>RKML</title>
+<link rel=stylesheet href="../OmegaTech.css" >
+</head>
+
+<body>
+<p align="right"><a href="@TAR_FILE@">@TAR_FILE@</a></p>
+<p align="right">@DATE@</p>
+<h1>Zillow</h1>
+
+<p>
+This package provides an R interface to the <a href="http://www.zillow.com">Zillow</a>
+<a href="http://www.zillow.com/howto/api/APIOverview.htm">Web Service
+API</a>.
+It allows one to
+<ol>
+  <li> get the Zillow estimate for the price of a particular
+property specified by street address and ZIP code (or city and state)
+  <li> find information (e.g. size of property and lot, number of
+      bedrooms and bathrooms, year built.) about a given property
+  <li> get comparable properties.
+</ol>
+
+One needs a (free) login for Zillow to access the Web service.
+</p>
+
+<p>
+The following gets the estimate
+<pre>
+ est = zestimate("1280 Monterey Avenue", "94707", zillowId)
+</pre>
+where <b>zillowId</b> is a string giving the Zillow key
+you obtained when you registered to use the Zillow Web Service.
+
+</p>
+
+<p>
+We can get the comparables with
+<pre>
+ comps = getComps(c("1280 Monterey Avenue", "94707"), zillowId)
+</pre>
+or
+<pre>
+ comps = getComps(rownames(est), zillowId)
+</pre>
+
+Then we can plot these with
+<pre>
+ plot(comps)
+</pre>
+</p>
+
+<hr>
+<address><a href="http://www.stat.ucdavis.edu/~duncan">Duncan Temple Lang</a>
+<a href=mailto:duncan@wald.ucdavis.edu>&lt;duncan@wald.ucdavis.edu&gt;</a></address>
+<!-- hhmts start -->
+Last modified: Mon Feb 22 14:16:44 PST 2010
+<!-- hhmts end -->
+</body> </html>

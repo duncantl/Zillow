@@ -1,0 +1,21 @@
+Package: Zillow
+Version: 0.1-1
+Title: Simple interface to Zillow.com's house price estimate API
+Description: This package provides relatively simple
+  facilities for querying Zillow.com for information
+  about estimated house prices for a property.
+  It allows one to get information about a particular property
+  and also about up to 30 "comparable" properties.
+  The information includes price estimate, range for the estimate,
+  tax assessment and year, zip code, lot and finished square feet,
+  number of bedrooms and bathrooms, date and price last sold.
+  All of this is made available by Zillow. This package is merely
+  an illustration of how this information can be retrieved in R via
+  Web services using the XML and RCurl packages.
+  To use this, you will need to have a Zillow account and
+  Zillow Web Services Id (ZWSID).
+Depends: XML, RCurl
+License: BSD
+Maintainer: Duncan Temple Lang <duncan@wald.ucdavis.edu>
+Author: Duncan Temple Lang
+URL:  http://www.zillow.com/howto/api/APIOverview.htm

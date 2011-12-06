@@ -1,0 +1,4 @@
+export(zestimate, getComps)
+S3method(plot, ZillowComparables)
+
+

@@ -144,3 +144,50 @@ function(x, threshold = NA, ...)
   
   invisible(x)
 }
+
+# Recursive comps (2 levels) ---
+zillowRecursiveComps <- function(address, citystatezip, zillowId=""){
+  require(RCurl)
+  require(XML)
+  require(data.table)
+  require(reshape2)
+    
+  u <- zestimate(address, citystatezip, zillowId)
+  
+  v <- getComps(row.names(u), zillowId,count=25)
+  w <- lapply(row.names(v),getComps, zillowId, count=25)     
+  zpidList <- list()
+  
+  for(i in 1:length(w)){
+    zpidList[[i]] <- rownames(w[[i]])
+  }  
+  zlist <- do.call("rbind",zpidList)
+  blah <- as.character(unique(melt(zlist)$value))
+  
+  x <- lapply(blah, getComps, zillowId, count=25)
+  y <- rbindlist(x)
+  z <- y[!duplicated(y$street)]
+  z$subject <- paste0(address," ",citystatezip)
+  return(z)
+}
+
+
+# Mapping --
+mapComps <- function(data, zoomLevel=11,subject=NA){
+  require(ggmap)
+  
+  
+  xMap <- median(data$longitude)
+  yMap <- median(data$latitude)
+  coord <- paste0(yMap, ", ", xMap)
+  compsMap <- qmap(coord, zoom = zoomLevel, color="bw")
+  
+  viewer <- compsMap + geom_point(aes(x = data$longitude, y = data$latitude),data = data, alpha=1/6,colour="red")
+  if(is.na(subject)==T){out <- viewer; out} else {
+    subj <- geocode(subject)
+    out <- viewer + 
+      geom_point(aes(data=subj$lon, y=subj$lat),data = subj,size=2,shape=9) + 
+      geom_point(aes(data=subj$lon, y=subj$lat),data = subj,size=2,alpha=1/4,colour="green")
+    out
+  }
+}

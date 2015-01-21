@@ -43,7 +43,7 @@ function(doc)
 }
 
 getComps =
-function(id, zillowId = getOption("ZillowId", stop("need zillow id")), count = 30, ...)
+function(id, zillowId = getOption("ZillowId", stop("need zillow id")), count = 25, ...)
 {
      # if the caller gives us an address rather than a zpid, find the zpid.
   if(!is.numeric(id) && length(grep("[^[:digit:]]", id))) {

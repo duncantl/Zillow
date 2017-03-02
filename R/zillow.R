@@ -37,8 +37,13 @@ function(doc)
     return(TRUE)
 
   i = match(code, zillowErrorTable[, 1])
-  e = simpleError(zillowErrorTable[i, 3])
-  class(e) = c(zillowErrorTable[i, 2], class(e))
+  if(is.na(i)) {
+     e = simpleError(gsub("^Error: ", "", xmlValue(msg[["text"]])))
+     class(e) = c("ZillowError", class(e))
+  } else {    
+     e = simpleError(zillowErrorTable[i, 3])
+     class(e) = c(zillowErrorTable[i, 2], class(e))
+  }
   stop(e)
 }
 
@@ -143,4 +148,23 @@ function(x, threshold = NA, ...)
             col = c("red", rep("blue", nrow(x) - 1)))
   
   invisible(x)
+}
+
+
+
+propertyDetails =
+function(zpid, zillowId = getOption("ZillowId", stop("need zillow id")), ...)
+{
+  if(grepl("[a-z]", zpid) && length(zpid) > 1) 
+     zpid = rownames(zestimate(zpid[1], zpid[2], zilowId = zillowId, ...))
+    
+  txt = getForm("http://www.zillow.com/webservice/GetUpdatedPropertyDetails.htm", 'zws-id' = zillowId, zpid = zpid, ...)
+  doc = xmlParse(txt, asText = TRUE)
+  els = getNodeSet(doc, "//response")
+  if(length(els))
+     xmlToList(els[[1]])
+  else {
+      browser()
+      NULL
+  }
 }

@@ -164,7 +164,6 @@ function(zpid, zillowId = getOption("ZillowId", stop("need zillow id")), ...)
   if(length(els))
      xmlToList(els[[1]])
   else {
-      browser()
-      NULL
+     NULL
   }
 }

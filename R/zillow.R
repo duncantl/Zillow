@@ -153,17 +153,50 @@ function(x, threshold = NA, ...)
 
 
 propertyDetails =
-function(zpid, zillowId = getOption("ZillowId", stop("need zillow id")), ...)
+function(zpid, zillowId = getOption("ZillowId", stop("need zillow id")), asDataFrame = length(zpid) > 1, ...)
 {
+    if(length(zpid) > 1) {
+        tmp = lapply(zpid, propertyDetails, zillowId, ...)
+        return(toCommonDF(lapply(tmp, function(x) x$editedFacts)))
+    }
+    
   if(grepl("[a-z]", zpid) && length(zpid) > 1) 
      zpid = rownames(zestimate(zpid[1], zpid[2], zilowId = zillowId, ...))
     
   txt = getForm("http://www.zillow.com/webservice/GetUpdatedPropertyDetails.htm", 'zws-id' = zillowId, zpid = zpid, ...)
   doc = xmlParse(txt, asText = TRUE)
-  els = getNodeSet(doc, "//response")
-  if(length(els))
-     xmlToList(els[[1]])
-  else {
-     NULL
+  code = xpathSApply(doc, "//message/code", xmlValue)
+  if(as.integer(code)/500 >= 1) {
+      e = simpleError(gsub("Error: ", "", xpathSApply(doc, "//message/text", xmlValue)))
+      class(e) = c(switch(code,
+                     "500" = "ZillowIDError",
+                     "501" = "ZillowProtectedDataError",
+                     "502" = "ZillowNoPropertyDataError"),
+                     "ZillowError", class(e))
+      stop(e)
   }
+  els = getNodeSet(doc, "//response")
+  xmlToList(els[[1]])
+}
+
+
+
+
+toCommonDF =
+function(vals)
+{
+    vals = vals[!sapply(vals, is.null)]
+    vars = sapply(vals, function(x) names(x)[sapply(x, length) == 1])
+    vars = unique(unlist(vars))
+    tmp = lapply(vals, function(x) {
+        v = structure(rep(NA, length(vars)), names = vars)
+        w = names(x) %in% vars
+                          v[names(x)[w]] = x[w]
+                          as.data.frame(v, stringsAsFactors = FALSE)
+    })
+    
+    ans = do.call(rbind, tmp)
+
+    ans[] = lapply(ans, type.convert)
+    ans
 }
